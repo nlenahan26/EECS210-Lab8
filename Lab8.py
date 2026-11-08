@@ -75,10 +75,12 @@ def print_matrix(M1, M2):
         
 # ----------------- YOUR ADDED CODE BELOW -----------------
 
+#Computes transitive closure using Boolean matrix multiplication 
 def transitive_closure(M):
     A = M
-    B = M.copy()
+    B = [row.copy() for row in M]
 
+    #Creates an empty matrix with 0s to store the result
     for i in range(2, len(M) + 1):
         result = []
         for i in range(len(M)):
@@ -87,24 +89,52 @@ def transitive_closure(M):
                 row.append(0)
             result.append(row)
 
+        #Calculates the Boolean product of A and M
         for i in range(len(M)):
             for j in range(len(M)):
                 for k in range(len(M)):
+                    #If both entries are 1, the result is 1
                     if A[i][k] == 1 and M[k][j] == 1:
                         result[i][j] = 1
                         break
 
+        #Updates A to be the next Boolean power
         A = result  
 
+        #Combines A and B using OR
         for row in range(len(M)):
             for col in range(len(M)):
                 if B[row][col] == 1 or A[row][col] == 1:
                     B[row][col] = 1
+
+    #Returns transitive closure matrix
     return B
 
-    
+#Computes transitive closure using the Warshall Algorithm 
+def warshall(M):
+
+    #Copies the original matrix
+    W = [row.copy() for row in M]
+
+    #Checks all possible paths between vertices and updates the matrix using OR and AND
+    for k in range(len(M)):
+        for i in range(len(M)):
+            for j in range(len(M)):
+                W[i][j] = int(W[i][j] or (W[i][k] and W[k][j]))
+
+    #Returns transitive closure matrix
+    return W
+
 def main():
-    matrix = get_square_matrix(ints=True) #use this for both algorithms
+    #Gets matrix from user
+    matrix = get_square_matrix(ints=True)
+
+    #Computes transitive closure using both algorithms
+    transitive = transitive_closure(matrix)
+    warsh = warshall(matrix)
+
+    #Prints transitive closure from both algorithms
+    print_matrix(transitive, warsh)
 
 if __name__ == "__main__":
     main()
